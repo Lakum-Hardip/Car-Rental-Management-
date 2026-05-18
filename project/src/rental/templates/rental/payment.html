@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Payment - Booking #{{ booking.booking_id }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 560px; margin-top: 32px;">
+    <div class="card" style="padding: 32px;">
+        <h1 style="margin-bottom: 8px;">Complete Payment</h1>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Booking #{{ booking.booking_id }} &bull; {{ booking.car.brand }} {{ booking.car.model }}</p>
+        <p style="font-size: 1.25rem; font-weight: 700; margin-bottom: 24px;">Total: ₹{{ booking.total_amount }}</p>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Payment Method</label>
+                {% for value, label in form.method.field.choices %}
+                <label style="display: flex; align-items: center; gap: 8px; margin: 8px 0; cursor: pointer;">
+                    <input type="radio" name="method" value="{{ value }}" required>
+                    <span>{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <div class="form-group" id="card_fields" style="display: none;">
+                <label>Last 4 digits (simulation)</label>
+                <input type="text" name="card_last_four" maxlength="4" placeholder="1234">
+            </div>
+            <div class="form-group" id="txn_fields" style="display: none;">
+                <label>Transaction ID (simulation)</label>
+                <input type="text" name="transaction_id" placeholder="TXN123456">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Pay ₹{{ booking.total_amount }}</button>
+        </form>
+        <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">This is a simulated payment. No real charges are made.</p>
+    </div>
+</div>
+<script>
+(function() {
+    var method = document.querySelectorAll('input[name="method"]');
+    var cardFields = document.getElementById('card_fields');
+    var txnFields = document.getElementById('txn_fields');
+    method.forEach(function(r) {
+        r.addEventListener('change', function() {
+            cardFields.style.display = (this.value === 'Card') ? 'block' : 'none';
+            txnFields.style.display = (this.value === 'Online') ? 'block' : 'none';
+        });
+    });
+})();
+</script>
+{% endblock %}

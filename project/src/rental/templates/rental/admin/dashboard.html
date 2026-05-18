@@ -1,0 +1,79 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Admin Dashboard - My Car{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>Dashboard</h1>
+    <span>Welcome, {{ admin_user.username }} ({{ admin_user.role }})</span>
+</div>
+<div class="stat-grid">
+    <div class="stat-card">
+        <h3>Total Bookings</h3>
+        <div class="value">{{ total_bookings }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Active Today</h3>
+        <div class="value">{{ today_bookings }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Total Revenue</h3>
+        <div class="value">₹{{ revenue_total }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Revenue Today</h3>
+        <div class="value">₹{{ revenue_today }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Vehicles</h3>
+        <div class="value">{{ vehicles_total }}</div>
+        <small>Available: {{ vehicles_available }} | Maintenance: {{ vehicles_maintenance }}</small>
+    </div>
+    <div class="stat-card">
+        <h3>Customers</h3>
+        <div class="value">{{ customers_count }}</div>
+    </div>
+</div>
+<div class="card">
+    <h2 style="margin-bottom: 16px;">Daily Bookings (Last 14 Days)</h2>
+    <canvas id="chartBookings" width="400" height="120"></canvas>
+</div>
+<div class="card">
+    <h2 style="margin-bottom: 16px;">Recent Bookings</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Customer</th><th>Car</th><th>Dates</th><th>Amount</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for b in recent_bookings %}
+            <tr>
+                <td>{{ b.booking_id }}</td>
+                <td>{{ b.customer.name }}</td>
+                <td>{{ b.car.brand }} {{ b.car.model }}</td>
+                <td>{{ b.start_date }} to {{ b.end_date }}</td>
+                <td>₹{{ b.total_amount }}</td>
+                <td>{{ b.payment_status }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No bookings yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+(function() {
+    var data = {{ daily_bookings_json|safe }};
+    if (typeof data === 'string') data = JSON.parse(data);
+    var canvas = document.getElementById('chartBookings');
+    if (!canvas || !data || !data.length) return;
+    var ctx = canvas.getContext('2d');
+    var values = data.map(function(d) { return d.count || 0; });
+    var max = Math.max.apply(null, values) || 1;
+    var h = 120; var w = canvas.width; var pad = 20;
+    ctx.fillStyle = '#0d9488';
+    values.forEach(function(v, i) {
+        var barW = (w - pad * 2) / values.length - 4;
+        var barH = (v / max) * (h - pad * 2);
+        ctx.fillRect(pad + i * (barW + 4), h - pad - barH, barW, barH);
+    });
+})();
+</script>
+{% endblock %}

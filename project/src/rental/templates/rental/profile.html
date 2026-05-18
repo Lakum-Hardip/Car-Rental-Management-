@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Profile - My Car{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 560px; margin-top: 32px;">
+    <h1 style="margin-bottom: 24px;">Profile</h1>
+    <div class="card" style="padding: 32px;">
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" value="{{ customer.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" value="{{ customer.email }}" disabled style="background: #f1f5f9;">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Email cannot be changed.</p>
+            </div>
+            <div class="form-group">
+                <label for="phone_no">Phone</label>
+                <input type="text" name="phone_no" id="phone_no" value="{{ customer.phone_no }}" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea name="address" id="address" rows="3">{{ customer.address }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

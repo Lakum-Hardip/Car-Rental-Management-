@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Track Vehicle - Booking #{{ booking.booking_id }}{% endblock %}
+{% block content %}
+<div class="container" style="margin-top: 32px;">
+    <h1 style="margin-bottom: 8px;">Vehicle Tracking</h1>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">{{ booking.car.brand }} {{ booking.car.model }} ({{ booking.car.reg_no }})</p>
+    <div class="card" style="padding: 24px;">
+        {% if google_maps_key %}
+            {% if car.latitude and car.longitude %}
+            <div id="map" style="height: 400px; border-radius: 12px;"></div>
+            <p style="margin-top: 16px; font-size: 0.9rem; color: var(--text-muted);">Pickup / last known location shown on map.</p>
+            <script>
+            function initMap() {
+                var lat = {{ car.latitude }};
+                var lng = {{ car.longitude }};
+                var center = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                var map = new google.maps.Map(document.getElementById('map'), { zoom: 15, center: center });
+                new google.maps.Marker({ position: center, map: map, title: '{{ car.brand }} {{ car.model }}' });
+            }
+            </script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap"></script>
+            {% else %}
+            <p style="color: var(--text-muted);">Location data not set for this vehicle. Admin can add coordinates in vehicle edit.</p>
+            {% endif %}
+        {% else %}
+        <p style="color: var(--text-muted);">Google Maps API key is not configured. Set GOOGLE_MAPS_API_KEY in settings for live tracking.</p>
+        <p style="margin-top: 8px;">Vehicle: {{ car.brand }} {{ car.model }} | Reg: {{ car.reg_no }}</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'rental:dashboard' %}" class="btn btn-outline" style="margin-top: 16px;">Back to Bookings</a>
+</div>
+{% endblock %}

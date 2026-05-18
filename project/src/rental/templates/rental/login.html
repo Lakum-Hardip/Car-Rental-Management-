@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Customer Login - My Car{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 440px; margin-top: 48px;">
+    <div class="card" style="padding: 32px;">
+        <h1 style="margin-bottom: 8px;">Customer Login</h1>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Sign in to book cars and manage your bookings.</p>
+        <form method="post" action="{% url 'rental:login' %}" id="loginForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_email">Email *</label>
+                <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required placeholder="your@email.com" maxlength="254" autocomplete="email">
+                {% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password">Password *</label>
+                <input type="password" name="password" id="id_password" required autocomplete="current-password" placeholder="Password">
+                {% if form.password.errors %}<p class="form-error">{{ form.password.errors.0 }}</p>{% endif %}
+            </div>
+            {% if form.non_field_errors %}
+                <p class="form-error">{{ form.non_field_errors.0 }}</p>
+            {% endif %}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Login</button>
+        </form>
+        <p style="margin-top: 14px; text-align: center;">
+            <a href="{% url 'rental:customer_password_reset_request' %}">Forgot password?</a>
+        </p>
+        <p style="margin-top: 20px; text-align: center;">
+            Don't have an account? <a href="{% url 'rental:register' %}">Register</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

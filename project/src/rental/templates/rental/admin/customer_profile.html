@@ -1,0 +1,60 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Customer Profile - My Car Admin{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>Customer Profile</h1>
+    <a href="{% url 'rental:admin_customer_list' %}" class="btn btn-outline">Back to Customers</a>
+</div>
+<div class="card" style="margin-bottom: 24px;">
+    <h2 style="margin-bottom: 16px;">{{ customer.name }}</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+        <div><strong>Customer ID:</strong> {{ customer.customer_id }}</div>
+        <div><strong>Email:</strong> {{ customer.email }}</div>
+        <div><strong>Phone:</strong> {{ customer.phone_no }}</div>
+        <div><strong>License No:</strong> {{ customer.license_no }}</div>
+        <div style="grid-column: 1 / -1;"><strong>Address:</strong> {{ customer.address|default:"-" }}</div>
+    </div>
+</div>
+<div class="card" style="margin-bottom: 24px;">
+    <h3 style="margin-bottom: 16px;">Booking History</h3>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Car</th><th>Dates</th><th>Amount</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td>{{ b.booking_id }}</td>
+                <td>{{ b.car.brand }} {{ b.car.model }} ({{ b.car.reg_no }})</td>
+                <td>{{ b.start_date }} to {{ b.end_date }}</td>
+                <td>₹{{ b.total_amount }}</td>
+                <td>{{ b.payment_status }}{% if b.is_cancelled %} (Cancelled){% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No bookings.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="card">
+    <h3 style="margin-bottom: 16px;">Payment History</h3>
+    <table>
+        <thead>
+            <tr><th>Payment ID</th><th>Booking</th><th>Amount</th><th>Method</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p.payment_id }}</td>
+                <td>#{{ p.booking.booking_id }} - {{ p.booking.car.brand }} {{ p.booking.car.model }}</td>
+                <td>₹{{ p.amount }}</td>
+                <td>{{ p.method }}</td>
+                <td>{{ p.payment_date }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No payments.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

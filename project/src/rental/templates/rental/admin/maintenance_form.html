@@ -1,0 +1,46 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}{{ title }} - Admin{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'rental:admin_maintenance_list' %}" class="btn btn-outline">Back</a>
+</div>
+<div class="card">
+    <form method="post" action="" id="maintenanceForm">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+            {{ field }}
+            {% if field.errors %}<p style="color: #dc2626; font-size: 0.85rem;">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+<script>
+(function() {
+    var today = new Date();
+    var minDate = new Date(today);
+    minDate.setFullYear(minDate.getFullYear() - 1);
+    var maxDate = new Date(today);
+    maxDate.setFullYear(maxDate.getFullYear() + 2);
+    var dateInput = document.getElementById('id_scheduled_date');
+    var form = document.getElementById('maintenanceForm');
+    if (dateInput) {
+        dateInput.setAttribute('min', minDate.toISOString().split('T')[0]);
+        dateInput.setAttribute('max', maxDate.toISOString().split('T')[0]);
+        dateInput.setAttribute('required', 'required');
+    }
+    if (form) form.addEventListener('submit', function(e) {
+        var desc = document.getElementById('id_description');
+        if (desc && desc.value.trim().length < 5) {
+            e.preventDefault();
+            alert('Description must be at least 5 characters.');
+            desc.focus();
+            return false;
+        }
+    });
+})();
+</script>
+{% endblock %}

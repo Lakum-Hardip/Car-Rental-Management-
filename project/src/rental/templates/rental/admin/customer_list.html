@@ -1,0 +1,27 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Customers - Admin{% endblock %}
+{% block content %}
+<div class="header"><h1>Customers</h1></div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>License</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for c in customers %}
+            <tr>
+                <td>{{ c.customer_id }}</td>
+                <td><a href="{% url 'rental:admin_customer_profile' c.customer_id %}">{{ c.name }}</a></td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.phone_no }}</td>
+                <td>{{ c.address|truncatewords:5 }}</td>
+                <td>{{ c.license_no }}</td>
+                <td><a href="{% url 'rental:admin_customer_profile' c.customer_id %}" class="btn btn-primary btn-sm">View Profile</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No customers.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

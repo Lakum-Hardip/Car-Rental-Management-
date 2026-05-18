@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ car.brand }} {{ car.model }} - My Car{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 640px; margin-top: 32px;">
+    <a href="{% url 'rental:car_detail' car.car_id %}"><i class="fas fa-arrow-left"></i> Back to car</a>
+    <div class="card" style="padding: 32px; margin-top: 16px;">
+        <h1 style="margin-bottom: 8px;">Book {{ car.brand }} {{ car.model }}</h1>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">₹{{ car.rent_per_day }}/day &bull; {{ car.reg_no }}</p>
+        <form method="post" action="" id="bookingForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_start_date">Start Date *</label>
+                <input type="date" name="start_date" id="id_start_date" value="{{ form.start_date.value|default:'' }}" required min="" title="Select start date">
+                {% if form.start_date.errors %}<p class="form-error">{{ form.start_date.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_end_date">End Date *</label>
+                <input type="date" name="end_date" id="id_end_date" value="{{ form.end_date.value|default:'' }}" required min="" title="Select end date">
+                {% if form.end_date.errors %}<p class="form-error">{{ form.end_date.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="card" style="padding: 16px; background: #f8fafc; margin: 20px 0; border: 1px solid var(--border);">
+                <h3 style="font-size: 1rem; margin-bottom: 8px;">Rental Agreement</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+                    By booking, you agree to return the vehicle on time, in the same condition. Late returns may incur a penalty. You are responsible for fuel and any damages during the rental period.
+                </p>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="accept_contract" required>
+                    <span>I accept the rental agreement terms</span>
+                </label>
+            </div>
+            {% if form.non_field_errors %}
+                <p class="form-error">{{ form.non_field_errors.0 }}</p>
+            {% endif %}
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Proceed to Payment</button>
+        </form>
+    </div>
+</div>
+<script>
+(function() {
+    var todayDate = new Date();
+    var today = todayDate.toISOString().split('T')[0];
+    // next 10 days (inclusive) => today + 9 days
+    var maxDateObj = new Date(todayDate);
+    maxDateObj.setDate(todayDate.getDate() + 9);
+    var maxDate = maxDateObj.toISOString().split('T')[0];
+    var form = document.getElementById('bookingForm');
+    var start = document.getElementById('id_start_date');
+    var end = document.getElementById('id_end_date');
+    var maxDays = 90;
+
+    if (start) {
+        start.setAttribute('min', today);
+        start.setAttribute('max', maxDate);
+        start.addEventListener('change', function() {
+            if (end) {
+                end.setAttribute('min', this.value);
+                if (end.value && end.value < this.value) end.value = this.value;
+            }
+        });
+    }
+    if (end) {
+        end.setAttribute('min', today);
+        end.setAttribute('max', maxDate);
+    }
+
+    if (form) form.addEventListener('submit', function(e) {
+        var sd = start && start.value ? new Date(start.value) : null;
+        var ed = end && end.value ? new Date(end.value) : null;
+        if (sd && ed) {
+            if (sd < new Date(today)) {
+                e.preventDefault();
+                alert('Start date cannot be in the past.');
+                start.focus();
+                return false;
+            }
+            if (sd > new Date(maxDate)) {
+                e.preventDefault();
+                alert('Start date must be within the next 10 days.');
+                start.focus();
+                return false;
+            }
+            if (ed < sd) {
+                e.preventDefault();
+                alert('End date must be on or after start date.');
+                end.focus();
+                return false;
+            }
+            if (ed > new Date(maxDate)) {
+                e.preventDefault();
+                alert('End date must be within the next 10 days.');
+                end.focus();
+                return false;
+            }
+            var days = Math.ceil((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
+            if (days > maxDays) {
+                e.preventDefault();
+                alert('Maximum rental period is ' + maxDays + ' days.');
+                return false;
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

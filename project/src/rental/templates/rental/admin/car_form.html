@@ -1,0 +1,21 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}{{ title }} - Admin{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'rental:admin_car_list' %}" class="btn btn-outline">Back to list</a>
+</div>
+<div class="card">
+    <form method="post" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom: 16px;">
+            <label for="id_{{ field.name }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p style="color: #dc2626; font-size: 0.85rem;">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+{% endblock %}

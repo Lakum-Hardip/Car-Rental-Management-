@@ -1,0 +1,26 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Activity Logs - Admin{% endblock %}
+{% block content %}
+<div class="header"><h1>Admin Activity Logs</h1></div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>Time</th><th>Admin</th><th>Action</th><th>Model</th><th>Details</th><th>IP</th></tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.created_at }}</td>
+                <td>{{ log.admin.username|default:"-" }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.model_name|default:"-" }}</td>
+                <td>{{ log.details|truncatewords:15 }}</td>
+                <td>{{ log.ip_address|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No activity logs.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

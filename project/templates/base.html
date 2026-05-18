@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Car{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --secondary: #1e293b;
+            --accent: #06b6d4;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #dc2626;
+            --success: #16a34a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        /* Header */
+        .header {
+            background: var(--card);
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; flex-wrap: wrap; gap: 12px; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        .nav { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .nav a { color: var(--text); font-weight: 500; }
+        .nav a:hover { color: var(--primary); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+            border: none; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); color: white; text-decoration: none; }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; text-decoration: none; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 0.875rem; }
+        /* Messages */
+        .messages { list-style: none; margin: 0; padding: 0; }
+        .messages li { padding: 12px 20px; margin-bottom: 8px; border-radius: 8px; }
+        .messages .success { background: #dcfce7; color: #166534; }
+        .messages .error { background: #fee2e2; color: #991b1b; }
+        .messages .warning { background: #fef3c7; color: #92400e; }
+        .messages .info { background: #dbeafe; color: #1e40af; }
+        /* Main */
+        main { padding: 24px 0 48px; min-height: 60vh; }
+        /* Footer */
+        .footer { background: var(--secondary); color: #94a3b8; padding: 32px 20px; margin-top: auto; }
+        .footer-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+        .footer a { color: #94a3b8; }
+        /* Cards */
+        .card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+        .card-body { padding: 20px; }
+        /* Form */
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"],
+        select, textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 1rem; font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text); }
+        .form-error { color: var(--danger); font-size: 0.875rem; margin-top: 4px; }
+        /* Grid */
+        .grid { display: grid; gap: 20px; }
+        .grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+        @media (max-width: 768px) {
+            .header-inner { flex-direction: column; align-items: stretch; }
+            .nav { justify-content: center; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="{% url 'rental:home' %}" class="logo"><i class="fas fa-car"></i> My Car</a>
+            <nav class="nav">
+                <a href="{% url 'rental:home' %}">Home</a>
+                <a href="{% url 'rental:car_list' %}">Browse Cars</a>
+                {% if request.session.user_type == 'customer' %}
+                    <a href="{% url 'rental:dashboard' %}">My Bookings</a>
+                    <a href="{% url 'rental:profile' %}">Profile</a>
+                    <a href="{% url 'rental:logout' %}">Logout</a>
+                    <a href="{% url 'rental:dashboard' %}" class="btn btn-primary btn-sm">Dashboard</a>
+                {% elif request.session.user_type == 'admin' %}
+                    <a href="{% url 'rental:admin_dashboard' %}">Admin Panel</a>
+                    <a href="{% url 'rental:logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'rental:login' %}">Login</a>
+                    <a href="{% url 'rental:register' %}">Register</a>
+                    <a href="{% url 'rental:login' %}" class="btn btn-outline btn-sm">Login</a>
+                    <a href="{% url 'rental:admin_login' %}">Admin</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="container" style="padding-top: 16px;">
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>&copy; 2024 My Car. Fast, secure &amp; reliable car rental with GPS tracking &amp; digital payments.</p>
+            <p style="margin-top: 10px;">
+                For any inquiry: <a href="tel:+919537500604" style="color: #94a3b8;">+91 9537500604</a>
+                &nbsp;|&nbsp;
+                <a href="mailto:mycar@gmail.com" style="color: #94a3b8;">mycar@gmail.com</a>
+            </p>
+        </div>
+    </footer>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

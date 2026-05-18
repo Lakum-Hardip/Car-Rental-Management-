@@ -1,0 +1,29 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Maintenance - Admin{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>Vehicle Maintenance</h1>
+    <a href="{% url 'rental:admin_maintenance_add' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Schedule Maintenance</a>
+</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>Car</th><th>Scheduled</th><th>Completed</th><th>Description</th><th>Cost</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for m in maintenances %}
+            <tr>
+                <td>{{ m.car.brand }} {{ m.car.model }} ({{ m.car.reg_no }})</td>
+                <td>{{ m.scheduled_date }}</td>
+                <td>{{ m.completed_date|default:"-" }}</td>
+                <td>{{ m.description|truncatewords:10 }}</td>
+                <td>₹{{ m.cost|default:0 }}</td>
+                <td>{{ m.status }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No maintenance records.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Vehicles - Admin{% endblock %}
+{% block content %}
+<div class="header">
+    <h1>Vehicles</h1>
+    <a href="{% url 'rental:admin_car_add' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Vehicle</a>
+</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Brand</th><th>Model</th><th>Reg No</th><th>Vehicle Type</th><th>Capacity</th><th>Rent/day</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for car in cars %}
+            <tr>
+                <td>{{ car.car_id }}</td>
+                <td>{{ car.brand }}</td>
+                <td>{{ car.model }}</td>
+                <td>{{ car.reg_no }}</td>
+                <td>{{ car.vehicle_type }}</td>
+                <td>{{ car.capacity }}</td>
+                <td>₹{{ car.rent_per_day }}</td>
+                <td>
+                    <form method="post" action="{% url 'rental:admin_car_status' car.car_id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 6px;">
+                            <option value="Available" {% if car.status == 'Available' %}selected{% endif %}>Available</option>
+                            <option value="Booked" {% if car.status == 'Booked' %}selected{% endif %}>Booked</option>
+                            <option value="Maintenance" {% if car.status == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    <a href="{% url 'rental:admin_car_edit' car.car_id %}" class="btn btn-outline btn-sm">Edit</a>
+                    <form method="post" action="{% url 'rental:admin_car_delete' car.car_id %}" style="display: inline;" onsubmit="return confirm('Delete this vehicle?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9">No vehicles. <a href="{% url 'rental:admin_car_add' %}">Add one</a>.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

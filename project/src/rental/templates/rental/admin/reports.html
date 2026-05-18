@@ -1,0 +1,68 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% block title %}Reports - Admin{% endblock %}
+{% block content %}
+<div class="header"><h1>Reports</h1></div>
+<div class="card">
+    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <a href="?period=day" class="btn {% if period == 'day' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Day</a>
+        <a href="?period=week" class="btn {% if period == 'week' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Week</a>
+        <a href="?period=month" class="btn {% if period == 'month' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Month</a>
+        <a href="?period=year" class="btn {% if period == 'year' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">Year</a>
+    </div>
+    <form method="get" style="display: flex; gap: 12px; align-items: end; margin-bottom: 16px; flex-wrap: wrap;">
+        <div class="form-group" style="margin: 0;">
+            <label for="period">Show report by</label>
+            <select id="period" name="period">
+                <option value="day" {% if period == 'day' %}selected{% endif %}>Day</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Week</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Month</option>
+                <option value="year" {% if period == 'year' %}selected{% endif %}>Year</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+    </form>
+    <h2 style="margin-bottom: 16px;">Bookings & Revenue Summary</h2>
+    <p style="margin-bottom: 12px; color: var(--text-muted);">
+        Total Bookings: <strong>{{ total_bookings }}</strong>
+        &nbsp;|&nbsp;
+        Total Revenue: <strong>₹{{ total_revenue }}</strong>
+    </p>
+    <table>
+        <thead>
+            <tr><th>Period</th><th>Bookings</th><th>Revenue</th></tr>
+        </thead>
+        <tbody>
+            {% for d in summary_rows %}
+            <tr>
+                <td>{{ d.label }}</td>
+                <td>{{ d.bookings }}</td>
+                <td>₹{{ d.revenue }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No data.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="card">
+    <h2 style="margin-bottom: 16px;">Vehicle Usage (Bookings per Car)</h2>
+    <table>
+        <thead>
+            <tr><th>Car</th><th>Reg No</th><th>Vehicle Type</th><th>Status</th><th>Booking Count</th></tr>
+        </thead>
+        <tbody>
+            {% for car in vehicle_usage %}
+            <tr>
+                <td>{{ car.brand }} {{ car.model }}</td>
+                <td>{{ car.reg_no }}</td>
+                <td>{{ car.vehicle_type }}</td>
+                <td>{{ car.status }}</td>
+                <td>{{ car.booking_count }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No vehicles.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

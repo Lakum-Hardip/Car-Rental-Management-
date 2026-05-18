@@ -1,0 +1,5 @@
+/* Car Rental System - Additional styles (optional) */
+.search-grid { display: grid; }
+@media (max-width: 768px) {
+    .search-grid { grid-template-columns: 1fr !important; }
+}

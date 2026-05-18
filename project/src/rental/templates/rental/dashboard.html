@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings - My Car{% endblock %}
+{% block content %}
+<div class="container" style="margin-top: 32px;">
+    <h1 style="margin-bottom: 8px;">Welcome, {{ customer.name }}</h1>
+    <p style="color: var(--text-muted); margin-bottom: 24px;">Manage your bookings and profile.</p>
+    <h2 style="margin-bottom: 16px;">Booking History</h2>
+    {% if bookings %}
+    <div class="grid" style="grid-template-columns: 1fr;">
+        {% for b in bookings %}
+        <div class="card" style="padding: 20px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h3 style="font-size: 1.1rem;">{{ b.car.brand }} {{ b.car.model }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">{{ b.start_date }} to {{ b.end_date }} &bull; ₹{{ b.total_amount }}</p>
+                    <span style="display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; margin-top: 8px;
+                        {% if b.payment_status == 'Paid' %}background: #dcfce7; color: #166534;{% else %}background: #fef3c7; color: #92400e;{% endif %}">
+                        {{ b.payment_status }}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="{% url 'rental:receipt' b.booking_id %}" class="btn btn-outline btn-sm">Receipt</a>
+                    {% if b.payment_status == 'Unpaid' %}
+                    <a href="{% url 'rental:payment' b.booking_id %}" class="btn btn-primary btn-sm">Pay Now</a>
+                    <a href="{% url 'rental:booking_cancel' b.booking_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this booking?');">Cancel</a>
+                    {% endif %}
+                    <a href="{% url 'rental:tracking' b.booking_id %}" class="btn btn-outline btn-sm"><i class="fas fa-map-marker-alt"></i> Track</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding: 48px; text-align: center;">
+        <i class="fas fa-calendar-check" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <p style="color: var(--text-muted);">You have no bookings yet.</p>
+        <a href="{% url 'rental:car_list' %}" class="btn btn-primary" style="margin-top: 16px;">Browse Cars</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
