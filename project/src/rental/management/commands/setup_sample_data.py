@@ -27,7 +27,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('\nVerifying admin user...'))
         self._ensure_admin_exists()
         
-        self.stdout.write(self.style.SUCCESS('\n✓ Sample data setup complete!\n'))
+        self.stdout.write(self.style.SUCCESS('\n[OK] Sample data setup complete!\n'))
     
     def _create_sample_cars(self):
         """Create sample car records."""
@@ -109,13 +109,13 @@ class Command(BaseCommand):
         created_count = 0
         for car_data in cars_data:
             if Car.objects.filter(reg_no=car_data['reg_no']).exists():
-                self.stdout.write(f"  ○ {car_data['brand']} {car_data['model']} ({car_data['reg_no']}) - Already exists")
+                self.stdout.write(f"  [SKIP] {car_data['brand']} {car_data['model']} ({car_data['reg_no']}) - Already exists")
                 continue
             
             car = Car.objects.create(**car_data)
             created_count += 1
             self.stdout.write(
-                self.style.SUCCESS(f"  ✓ Created: {car.brand} {car.model} ({car.reg_no}) - ${car.rent_per_day}/day")
+                self.style.SUCCESS(f"  [OK] Created: {car.brand} {car.model} ({car.reg_no}) - ${car.rent_per_day}/day")
             )
         
         self.stdout.write(f"\nSummary: Created {created_count} new cars, {len(cars_data) - created_count} already existed")
@@ -149,7 +149,7 @@ class Command(BaseCommand):
         created_count = 0
         for cust_data in customers_data:
             if Customer.objects.filter(email=cust_data['email']).exists():
-                self.stdout.write(f"  ○ {cust_data['name']} ({cust_data['email']}) - Already exists")
+                self.stdout.write(f"  [SKIP] {cust_data['name']} ({cust_data['email']}) - Already exists")
                 continue
             
             customer = Customer(**cust_data)
@@ -157,7 +157,7 @@ class Command(BaseCommand):
             customer.save()
             created_count += 1
             self.stdout.write(
-                self.style.SUCCESS(f"  ✓ Created: {customer.name} ({customer.email})")
+                self.style.SUCCESS(f"  [OK] Created: {customer.name} ({customer.email})")
             )
         
         self.stdout.write(f"\nSummary: Created {created_count} new customers, {len(customers_data) - created_count} already existed")
@@ -168,7 +168,7 @@ class Command(BaseCommand):
         """Ensure admin user exists."""
         if AdminUser.objects.filter(username='admin').exists():
             admin = AdminUser.objects.get(username='admin')
-            self.stdout.write(self.style.SUCCESS(f"  ✓ Admin user 'admin' ({admin.role}) already exists"))
+            self.stdout.write(self.style.SUCCESS(f"  [OK] Admin user 'admin' ({admin.role}) already exists"))
             return
         
         admin = AdminUser(
@@ -178,7 +178,7 @@ class Command(BaseCommand):
         )
         admin.set_password('admin123')
         admin.save()
-        self.stdout.write(self.style.SUCCESS(f"  ✓ Created admin user:"))
+        self.stdout.write(self.style.SUCCESS(f"  [OK] Created admin user:"))
         self.stdout.write(f"     Username: admin")
         self.stdout.write(f"     Password: admin123")
         self.stdout.write(f"     Role: Manager")
