@@ -1,0 +1,1 @@
+# Rental views package

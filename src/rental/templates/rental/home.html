@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Velocity 3D - Next-Gen Luxury & Performance Car Rental{% endblock %}
+
+{% block content %}
+<!-- 3D Hero Section with Three.js Holographic Supercar -->
+<section class="hero-section">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-satellite-dish"></i> Real-Time Telematics & Instant Digital Booking
+            </div>
+            <h1 class="hero-title">
+                Drive the Future in <span class="text-gradient">Ultra-Modern</span> Style.
+            </h1>
+            <p class="hero-subtitle">
+                Experience next-generation car rentals with precision handling, digital verification, and high-performance vehicles ready at your command.
+            </p>
+            
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <a href="#searchSection" class="btn-3d btn-3d-primary">
+                    <i class="fas fa-magnifying-glass"></i> Find Your Ride
+                </a>
+                <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-glass">
+                    <i class="fas fa-layer-group"></i> View Fleet ({{ cars_featured|length }}+)
+                </a>
+            </div>
+
+            <!-- Fast Stat Counters in 3D Glass -->
+            <div style="display: flex; gap: 24px; margin-top: 40px; border-top: 1px solid var(--border-subtle); padding-top: 24px;">
+                <div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff; font-family: var(--font-heading);">100%</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Verified Fleet</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-glow); font-family: var(--font-heading);">0-Key</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Digital Paperwork</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff; font-family: var(--font-heading);">24/7</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">GPS Concierge</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive 3D Canvas Stage with Procedural Three.js Supercar -->
+    <div class="hero-3d-stage">
+        <div id="heroCanvas3D"></div>
+    </div>
+</section>
+
+<!-- 3D Glass Floating Search Bar Section -->
+<section id="searchSection" class="container" style="margin-top: -30px; position: relative; z-index: 10;">
+    <div class="search-card-3d tilt-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></div>
+                <h3 style="font-size: 1.2rem; color: #ffffff;">Quick Fleet Search & Availability</h3>
+            </div>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Instant dispatch in Ahmedabad, Mumbai, Delhi, Bengaluru & more</span>
+        </div>
+
+        <form action="{% url 'rental:car_list' %}" method="get" id="homeSearchForm">
+            <div class="search-grid-inputs">
+                <div class="form-group-3d">
+                    <label><i class="fas fa-location-dot" style="color: var(--accent-primary);"></i> Location / City</label>
+                    <input type="text" name="location" class="input-3d" placeholder="e.g. Ahmedabad, Mumbai" value="{{ request.GET.location }}">
+                </div>
+                <div class="form-group-3d">
+                    <label><i class="fas fa-calendar-alt" style="color: var(--accent-primary);"></i> Pick-up Date</label>
+                    <input type="date" name="start_date" id="start_date" class="input-3d" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="form-group-3d">
+                    <label><i class="fas fa-calendar-check" style="color: var(--accent-primary);"></i> Return Date</label>
+                    <input type="date" name="end_date" id="end_date" class="input-3d" value="{{ request.GET.end_date }}">
+                </div>
+                <div class="form-group-3d">
+                    <label><i class="fas fa-car" style="color: var(--accent-primary);"></i> Brand / Category</label>
+                    <input type="text" name="car_type" class="input-3d" placeholder="e.g. Fortuner, Creta, SUV" value="{{ request.GET.car_type }}">
+                </div>
+                <div>
+                    <button type="submit" class="btn-3d btn-3d-primary" style="width: 100%; height: 48px;">
+                        <i class="fas fa-bolt"></i> Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Featured Fleet Showcase with 3D Holographic Tilt Cards -->
+<section class="container" style="margin-top: 70px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div class="hero-badge" style="margin-bottom: 8px;">
+                <i class="fas fa-star" style="color: #f59e0b;"></i> Prime Selection
+            </div>
+            <h2 style="font-size: 2.2rem; color: #ffffff;">Featured Performance Vehicles</h2>
+        </div>
+        <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+            View All Vehicles <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+
+    {% if cars_featured %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;">
+        {% for car in cars_featured %}
+        <div class="car-card-3d tilt-card">
+            <div class="car-image-container">
+                <span class="car-tag">
+                    <i class="fas fa-circle-check" style="color: #10b981;"></i> {{ car.status }}
+                </span>
+                {% if car.image %}
+                <img src="{{ car.image.url }}" alt="{{ car.brand }} {{ car.model }}" loading="lazy">
+                {% else %}
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+                    <i class="fas fa-car-side" style="font-size: 3.5rem; color: var(--border-highlight); margin-bottom: 8px;"></i>
+                    <span>Velocity Certified Vehicle</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="car-body-3d">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h3 class="car-title-3d">{{ car.brand }} {{ car.model }}</h3>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">REG: {{ car.reg_no }}</span>
+                    </div>
+                    <span style="background: rgba(6, 182, 212, 0.15); color: var(--accent-glow); padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">
+                        {{ car.vehicle_type }}
+                    </span>
+                </div>
+
+                <div class="car-meta-pills">
+                    <span class="meta-pill"><i class="fas fa-gas-pump"></i> {{ car.vehicle_type }}</span>
+                    <span class="meta-pill"><i class="fas fa-users"></i> {{ car.capacity }} Seats</span>
+                    <span class="meta-pill"><i class="fas fa-shield-alt"></i> Insured</span>
+                </div>
+
+                <div class="car-price-row">
+                    <div>
+                        <span class="price-value">₹{{ car.rent_per_day }}</span>
+                        <span class="price-period">/ day</span>
+                    </div>
+                    <a href="{% url 'rental:car_detail' car.car_id %}" class="btn-3d btn-3d-primary btn-3d-sm">
+                        <span>Rent Now</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-3d" style="text-align: center; padding: 60px 20px;">
+        <i class="fas fa-car-rear" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3 style="margin-bottom: 8px;">No Fleet Vehicles Configured Yet</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Please check back soon or browse our full directory.</p>
+        <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-primary">Explore All</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- 3D Feature Grid: Why Choose Velocity 3D -->
+<section class="container" style="margin-top: 90px;">
+    <div style="text-align: center; max-width: 650px; margin: 0 auto 50px;">
+        <div class="hero-badge" style="margin-bottom: 12px;">
+            <i class="fas fa-gem" style="color: var(--accent-glow);"></i> Engineered For Excellence
+        </div>
+        <h2 style="font-size: 2.4rem; color: #ffffff; margin-bottom: 14px;">The Velocity Advantage</h2>
+        <p style="color: var(--text-secondary); font-size: 1.05rem;">
+            Built with modern web architecture and seamless automotive telemetry for stress-free journeys.
+        </p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-box-3d tilt-card">
+            <div class="feature-icon-3d">
+                <i class="fas fa-satellite"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px; color: #ffffff;">Live GPS Telematics</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Every vehicle is linked to our real-time GPS tracking grid. Track live location, calculate precise pickup windows, and stay secure.
+            </p>
+        </div>
+
+        <div class="feature-box-3d tilt-card">
+            <div class="feature-icon-3d" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));">
+                <i class="fas fa-file-contract" style="color: #a855f7;"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px; color: #ffffff;">Digital Smart Contract</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Instant online contract execution with clear terms, zero hidden security deposits, and immediate PDF invoice dispatch.
+            </p>
+        </div>
+
+        <div class="feature-box-3d tilt-card">
+            <div class="feature-icon-3d" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));">
+                <i class="fas fa-credit-card" style="color: #10b981;"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px; color: #ffffff;">Encrypted Fast Payments</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Multi-channel payment gateway simulation supporting UPI, Cards, and Net Banking with instant automated confirmation.
+            </p>
+        </div>
+
+        <div class="feature-box-3d tilt-card">
+            <div class="feature-icon-3d" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.2));">
+                <i class="fas fa-shield-halved" style="color: #f59e0b;"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 10px; color: #ffffff;">Automated Refund Policy</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Fair cancellation matrices with automated refund calculations and complete audit trails for every transaction.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner in 3D Cyber Card -->
+<section class="container" style="margin-top: 80px;">
+    <div class="card-3d tilt-card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(6, 182, 212, 0.15) 100%); border: 1px solid rgba(6, 182, 212, 0.3); padding: 48px; text-align: center;">
+        <h2 style="font-size: 2.2rem; margin-bottom: 12px; color: #ffffff;">Ready For The Ultimate Road Trip?</h2>
+        <p style="color: var(--text-secondary); max-width: 550px; margin: 0 auto 28px; font-size: 1.05rem;">
+            Join thousands of happy drivers who rent with Velocity 3D every month. Reserve your luxury SUV or sports sedan now.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-primary" style="padding: 14px 32px; font-size: 1.05rem;">
+                <i class="fas fa-key"></i> Book A Vehicle Today
+            </a>
+            <a href="{% url 'rental:register' %}" class="btn-3d btn-3d-glass" style="padding: 14px 32px; font-size: 1.05rem;">
+                <i class="fas fa-user-plus"></i> Create Free Account
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Date Range Validation Script -->
+<script>
+(function() {
+    var today = new Date().toISOString().split('T')[0];
+    var form = document.getElementById('homeSearchForm');
+    var start = document.getElementById('start_date');
+    var end = document.getElementById('end_date');
+    var maxDays = 90;
+
+    if (start) {
+        start.setAttribute('min', today);
+        start.addEventListener('change', function() {
+            if (end) {
+                end.setAttribute('min', this.value);
+                if (end.value && end.value < this.value) end.value = this.value;
+            }
+        });
+    }
+    if (end) end.setAttribute('min', today);
+
+    if (form) form.addEventListener('submit', function(e) {
+        var sd = start && start.value ? new Date(start.value) : null;
+        var ed = end && end.value ? new Date(end.value) : null;
+        if ((sd && !ed) || (!sd && ed)) {
+            e.preventDefault();
+            alert('Please provide both start and end dates, or leave both empty to browse all cars.');
+            return false;
+        }
+        if (sd && ed) {
+            if (ed < sd) {
+                e.preventDefault();
+                alert('End date must be on or after start date.');
+                end.focus();
+                return false;
+            }
+            var days = Math.ceil((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
+            if (days > maxDays) {
+                e.preventDefault();
+                alert('Maximum rental period is ' + maxDays + ' days.');
+                return false;
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

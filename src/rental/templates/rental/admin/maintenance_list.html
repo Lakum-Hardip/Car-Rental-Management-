@@ -1,0 +1,56 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Garage & Maintenance - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Fleet Maintenance & Garage Logs</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Track scheduled services, parts replacement costs, and maintenance readiness.</p>
+    </div>
+    <a href="{% url 'rental:admin_maintenance_add' %}" class="btn-3d btn-3d-primary btn-3d-sm">
+        <i class="fas fa-wrench"></i> Schedule Maintenance
+    </a>
+</div>
+
+<div class="table-3d-wrap tilt-card">
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Vehicle Target</th>
+                <th>Scheduled Date</th>
+                <th>Completion Date</th>
+                <th>Service Notes</th>
+                <th>Estimated Cost</th>
+                <th>Service Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in maintenances %}
+            <tr>
+                <td>
+                    <strong style="color: #ffffff;">{{ m.car.brand }} {{ m.car.model }}</strong>
+                    <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted);">{{ m.car.reg_no }}</div>
+                </td>
+                <td>{{ m.scheduled_date }}</td>
+                <td>{{ m.completed_date|default:"In Progress" }}</td>
+                <td style="color: var(--text-secondary);">{{ m.description|truncatewords:10 }}</td>
+                <td style="font-weight: 700; color: #ffffff;">₹{{ m.cost|default:0 }}</td>
+                <td>
+                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+                        {% if m.status == 'Completed' %}background: rgba(16, 185, 129, 0.2); color: #34d399;{% else %}background: rgba(245, 158, 11, 0.2); color: #fbbf24;{% endif %}">
+                        {{ m.status }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No garage or maintenance operations currently recorded.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

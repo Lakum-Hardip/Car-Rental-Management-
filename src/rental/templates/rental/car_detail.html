@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ car.brand }} {{ car.model }} - Vehicle Specifications | Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    <!-- Breadcrumb back link -->
+    <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-glass btn-3d-sm" style="margin-bottom: 24px;">
+        <i class="fas fa-arrow-left"></i> Back to Fleet
+    </a>
+
+    <div class="card-3d" style="padding: 36px; border-color: rgba(6, 182, 212, 0.25);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 40px; align-items: start;">
+            
+            <!-- Vehicle Visual & Interactive Map -->
+            <div>
+                <div class="car-image-container tilt-card" style="height: 380px; border-radius: 18px; border: 1px solid var(--border-subtle); box-shadow: var(--glow-card);">
+                    <span class="car-tag">
+                        <i class="fas fa-circle-check" style="color: #10b981;"></i> {{ car.status }}
+                    </span>
+                    {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="{{ car.brand }} {{ car.model }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); height: 100%;">
+                        <i class="fas fa-car-side" style="font-size: 5rem; color: var(--border-highlight); margin-bottom: 12px;"></i>
+                        <span>Velocity Certified Fleet</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- GPS Map Hub -->
+                {% if google_maps_key and car.latitude and car.longitude %}
+                <div style="margin-top: 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <i class="fas fa-location-crosshairs" style="color: var(--accent-glow);"></i>
+                        <h4 style="font-size: 1rem; color: #ffffff;">Live Vehicle Telematics Hub</h4>
+                    </div>
+                    <div id="map" style="height: 220px; border-radius: 16px; border: 1px solid var(--border-subtle); overflow: hidden;"></div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Vehicle Details & Reservation Action -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div>
+                    <div class="hero-badge" style="margin-bottom: 12px;">
+                        <i class="fas fa-bolt"></i> Premium Certified Fleet
+                    </div>
+                    <h1 style="font-size: 2.5rem; line-height: 1.15; color: #ffffff; margin-bottom: 8px;">
+                        {{ car.brand }} <span class="text-gradient">{{ car.model }}</span>
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; font-family: monospace;">
+                        REGISTRATION: {{ car.reg_no }} &bull; REF: VEL-{{ car.car_id }}09
+                    </p>
+                </div>
+
+                <!-- Specs Grid in 3D Frosted Pills -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px;">
+                    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; text-align: center;">
+                        <i class="fas fa-gas-pump" style="color: var(--accent-glow); font-size: 1.3rem; margin-bottom: 6px;"></i>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">POWERTRAIN</div>
+                        <div style="font-weight: 700; color: #ffffff;">{{ car.vehicle_type }}</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; text-align: center;">
+                        <i class="fas fa-users" style="color: var(--accent-glow); font-size: 1.3rem; margin-bottom: 6px;"></i>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">SEATING</div>
+                        <div style="font-weight: 700; color: #ffffff;">{{ car.capacity }} Adults</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; text-align: center;">
+                        <i class="fas fa-shield-halved" style="color: #10b981; font-size: 1.3rem; margin-bottom: 6px;"></i>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">COVERAGE</div>
+                        <div style="font-weight: 700; color: #10b981;">Full Shield</div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; text-align: center;">
+                        <i class="fas fa-satellite" style="color: #a855f7; font-size: 1.3rem; margin-bottom: 6px;"></i>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">TRACKING</div>
+                        <div style="font-weight: 700; color: #a855f7;">Active GPS</div>
+                    </div>
+                </div>
+
+                <!-- Pricing & Booking Card Box -->
+                <div style="background: linear-gradient(135deg, rgba(8, 11, 17, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 18px; padding: 24px; box-shadow: var(--glow-cyan);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+                        <div>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Standard Daily Rate</span>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #ffffff; font-family: var(--font-heading);">
+                                ₹{{ car.rent_per_day }}<span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;"> / 24 hrs</span>
+                            </div>
+                        </div>
+                        <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                            Best Price Guarantee
+                        </span>
+                    </div>
+
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-secondary);">
+                        <li><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i> Unlimited kilometers within rental boundary</li>
+                        <li><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i> Sanitized interior and contactless handoff option</li>
+                        <li><i class="fas fa-check" style="color: #10b981; margin-right: 8px;"></i> 24/7 Roadside breakdown and towing assistance</li>
+                    </ul>
+
+                    {% if car.status == 'Available' %}
+                    <a href="{% url 'rental:booking_create' car.car_id %}" class="btn-3d btn-3d-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+                        <i class="fas fa-bolt"></i> Reserve This Vehicle Now
+                    </a>
+                    {% else %}
+                    <div style="padding: 14px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; color: #fbbf24; text-align: center; font-weight: 600;">
+                        <i class="fas fa-clock"></i> Currently {{ car.status }} - Check Back Soon
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if google_maps_key and car.latitude and car.longitude %}
+<script>
+function initMap() {
+    var lat = {{ car.latitude }};
+    var lng = {{ car.longitude }};
+    var center = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    var map = new google.maps.Map(document.getElementById('map'), { 
+        zoom: 14, 
+        center: center,
+        styles: [
+            { "elementType": "geometry", "stylers": [{"color": "#1d2c4d"}] },
+            { "elementType": "labels.text.fill", "stylers": [{"color": "#8ec3b9"}] },
+            { "elementType": "labels.text.stroke", "stylers": [{"color": "#1a3646"}] },
+            { "featureType": "road", "elementType": "geometry", "stylers": [{"color": "#304a7d"}] }
+        ]
+    });
+    new google.maps.Marker({ position: center, map: map, title: '{{ car.brand }} {{ car.model }}' });
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap"></script>
+{% endif %}
+{% endblock %}

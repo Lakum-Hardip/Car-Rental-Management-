@@ -1,0 +1,164 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Fleet Command Dashboard - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <div class="hero-badge" style="margin-bottom: 6px;"><i class="fas fa-shield-halved"></i> Role: {{ admin_user.role }}</div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Fleet Command Center</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Welcome back, <strong>{{ admin_user.username }}</strong>. Real-time fleet metrics and telemetry overview.</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <a href="{% url 'rental:admin_car_add' %}" class="btn-3d btn-3d-primary btn-3d-sm">
+            <i class="fas fa-plus"></i> Add Vehicle
+        </a>
+        <a href="{% url 'rental:admin_reports' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+            <i class="fas fa-chart-line"></i> Analytics
+        </a>
+    </div>
+</div>
+
+<!-- 3D Stat Grid -->
+<div class="stat-grid-3d">
+    <div class="stat-card-3d tilt-card">
+        <h3>Total Reservations</h3>
+        <div class="stat-val text-gradient-cyan">{{ total_bookings }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-calendar-check"></i> All time verified</span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Active Fleet Today</h3>
+        <div class="stat-val" style="color: #34d399;">{{ today_bookings }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-road"></i> On the road now</span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Total Revenue</h3>
+        <div class="stat-val text-gradient">₹{{ revenue_total }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-credit-card"></i> Processed volume</span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Today's Inflow</h3>
+        <div class="stat-val" style="color: #a855f7;">₹{{ revenue_today }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-bolt"></i> Settled today</span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Fleet Inventory</h3>
+        <div class="stat-val" style="color: #ffffff;">{{ vehicles_total }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">
+            <span style="color: #34d399;">{{ vehicles_available }} Available</span> &bull; 
+            <span style="color: #fbbf24;">{{ vehicles_maintenance }} In Garage</span>
+        </span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Registered Drivers</h3>
+        <div class="stat-val" style="color: #38bdf8;">{{ customers_count }}</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-id-card"></i> Verified profiles</span>
+    </div>
+</div>
+
+<!-- 3D Canvas Analytics Chart -->
+<div class="card-3d tilt-card" style="margin-bottom: 32px; padding: 26px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.25rem; color: #ffffff;">14-Day Booking Velocity Trend</h2>
+        <span style="font-size: 0.85rem; color: var(--accent-glow);"><i class="fas fa-chart-column"></i> Daily Reservation Volume</span>
+    </div>
+    <div style="width: 100%; height: 160px; position: relative;">
+        <canvas id="chartBookings" style="width: 100%; height: 100%; display: block;"></canvas>
+    </div>
+</div>
+
+<!-- Recent Reservations Table in 3D Card -->
+<div class="table-3d-wrap tilt-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 1.25rem; color: #ffffff;">Recent Reservations</h2>
+        <a href="{% url 'rental:admin_booking_list' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+            View All <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Booking Ref</th>
+                <th>Driver Name</th>
+                <th>Assigned Vehicle</th>
+                <th>Schedule</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in recent_bookings %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#VEL-{{ b.booking_id }}</td>
+                <td>
+                    <strong style="color: #ffffff;">{{ b.customer.name }}</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ b.customer.email }}</div>
+                </td>
+                <td>{{ b.car.brand }} {{ b.car.model }}</td>
+                <td style="font-size: 0.88rem; color: var(--text-secondary);">{{ b.start_date }} &rarr; {{ b.end_date }}</td>
+                <td style="font-weight: 700; color: #ffffff;">₹{{ b.total_amount }}</td>
+                <td>
+                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+                        {% if b.payment_status == 'Paid' %}background: rgba(16, 185, 129, 0.2); color: #34d399;{% else %}background: rgba(245, 158, 11, 0.2); color: #fbbf24;{% endif %}">
+                        {{ b.payment_status }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                    No reservation records found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function() {
+    var data = {{ daily_bookings_json|safe }};
+    if (typeof data === 'string') data = JSON.parse(data);
+    var canvas = document.getElementById('chartBookings');
+    if (!canvas || !data || !data.length) return;
+    
+    // Scale canvas properly for crisp rendering
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * (window.devicePixelRatio || 1);
+    canvas.height = 160 * (window.devicePixelRatio || 1);
+
+    var ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+
+    var values = data.map(function(d) { return d.count || 0; });
+    var max = Math.max.apply(null, values) || 4;
+    var w = rect.width;
+    var h = 160;
+    var pad = 16;
+    var barW = (w - pad * 2) / values.length - 8;
+
+    values.forEach(function(v, i) {
+        var barH = Math.max(8, (v / max) * (h - pad * 2));
+        var x = pad + i * (barW + 8);
+        var y = h - pad - barH;
+
+        // Gradient for each modern cyber bar
+        var grad = ctx.createLinearGradient(0, y, 0, h - pad);
+        grad.addColorStop(0, '#06b6d4');
+        grad.addColorStop(1, '#3b82f6');
+        ctx.fillStyle = grad;
+
+        // Rounded bar
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, barW, barH, [6, 6, 0, 0]) : ctx.rect(x, y, barW, barH);
+        ctx.fill();
+    });
+})();
+</script>
+{% endblock %}

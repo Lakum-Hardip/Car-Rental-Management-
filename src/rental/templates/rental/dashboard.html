@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Driver Dashboard - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 70px;">
+    <!-- Welcome Header Banner -->
+    <div class="card-3d tilt-card" style="margin-bottom: 36px; padding: 32px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 182, 212, 0.15) 100%); border-color: rgba(6, 182, 212, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <div class="hero-badge" style="margin-bottom: 8px;">
+                    <i class="fas fa-id-badge"></i> Authenticated Driver
+                </div>
+                <h1 style="font-size: 2.3rem; color: #ffffff;">Welcome back, <span class="text-gradient">{{ customer.name }}</span></h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Email: {{ customer.email }} &bull; License: {{ customer.license_no|default:"Verified" }}</p>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="{% url 'rental:profile' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                    <i class="fas fa-user-pen"></i> Edit Profile
+                </a>
+                <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-primary btn-3d-sm">
+                    <i class="fas fa-plus"></i> New Reservation
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking History -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-size: 1.6rem; color: #ffffff;">Your Reservation History</h2>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">{{ bookings|length }} active or completed trips</span>
+    </div>
+
+    {% if bookings %}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for b in bookings %}
+        <div class="card-3d tilt-card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="width: 60px; height: 60px; border-radius: 14px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--accent-glow);">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 4px;">{{ b.car.brand }} {{ b.car.model }}</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            <i class="fas fa-calendar" style="color: var(--accent-primary); margin-right: 5px;"></i> {{ b.start_date }} to {{ b.end_date }}
+                            &bull; 
+                            <span style="font-family: monospace; color: var(--text-muted);">REG: {{ b.car.reg_no }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff; font-family: var(--font-heading);">₹{{ b.total_amount }}</div>
+                    <span style="display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; margin-top: 4px;
+                        {% if b.payment_status == 'Paid' %}background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);{% else %}background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);{% endif %}">
+                        <i class="fas {% if b.payment_status == 'Paid' %}fa-check-circle{% else %}fa-clock{% endif %}"></i> {{ b.payment_status }}
+                    </span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle); flex-wrap: wrap;">
+                <a href="{% url 'rental:receipt' b.booking_id %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                    <i class="fas fa-receipt"></i> Invoice
+                </a>
+                <a href="{% url 'rental:receipt_pdf' b.booking_id %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <a href="{% url 'rental:tracking' b.booking_id %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                    <i class="fas fa-location-dot" style="color: var(--accent-glow);"></i> Live GPS
+                </a>
+                {% if b.payment_status == 'Unpaid' %}
+                <a href="{% url 'rental:payment' b.booking_id %}" class="btn-3d btn-3d-primary btn-3d-sm">
+                    <i class="fas fa-credit-card"></i> Pay Now
+                </a>
+                <a href="{% url 'rental:booking_cancel' b.booking_id %}" class="btn-3d btn-3d-danger btn-3d-sm" onclick="return confirm('Cancel this reservation?');">
+                    <i class="fas fa-xmark"></i> Cancel
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-3d" style="text-align: center; padding: 60px 20px;">
+        <i class="fas fa-calendar-xmark" style="font-size: 3.5rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3 style="color: #ffffff; margin-bottom: 8px;">No Reservations on Record</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">You haven't reserved any vehicles yet. Discover our premium available fleet.</p>
+        <a href="{% url 'rental:car_list' %}" class="btn-3d btn-3d-primary">
+            <i class="fas fa-car-side"></i> Browse Fleet
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

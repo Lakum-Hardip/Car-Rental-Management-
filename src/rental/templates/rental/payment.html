@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Checkout & Gateway Simulation - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 620px; padding-top: 40px; padding-bottom: 70px;">
+    <div class="card-3d tilt-card" style="padding: 38px; border-color: rgba(6, 182, 212, 0.3);">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="logo-icon-3d" style="width: 52px; height: 52px; font-size: 1.4rem; margin: 0 auto 16px; background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);">
+                <i class="fas fa-shield-check"></i>
+            </div>
+            <h1 style="font-size: 1.9rem; color: #ffffff; margin-bottom: 6px;">Secure Payment Terminal</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Booking #{{ booking.booking_id }} &bull; {{ booking.car.brand }} {{ booking.car.model }}
+            </p>
+        </div>
+
+        <!-- Total Bill Card -->
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Total Invoice Amount</span>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #ffffff; font-family: var(--font-heading);">
+                    ₹{{ booking.total_amount }}
+                </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                <i class="fas fa-lock"></i> 256-Bit SSL
+            </span>
+        </div>
+
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group-3d" style="margin-bottom: 20px;">
+                <label><i class="fas fa-credit-card" style="color: var(--accent-primary);"></i> Select Payment Instrument</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 8px;">
+                    {% for value, label in form.method.field.choices %}
+                    <label style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;">
+                        <input type="radio" name="method" value="{{ value }}" required style="accent-color: var(--accent-primary);">
+                        <span style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">{{ label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group-3d" id="card_fields" style="display: none; margin-bottom: 20px;">
+                <label for="id_card"><i class="fas fa-credit-card" style="color: var(--accent-primary);"></i> Last 4 Digits of Card (Simulation)</label>
+                <input type="text" name="card_last_four" id="id_card" class="input-3d" maxlength="4" placeholder="e.g. 4242">
+            </div>
+
+            <div class="form-group-3d" id="txn_fields" style="display: none; margin-bottom: 20px;">
+                <label for="id_txn"><i class="fas fa-receipt" style="color: var(--accent-primary);"></i> Transaction Reference (Simulation)</label>
+                <input type="text" name="transaction_id" id="id_txn" class="input-3d" placeholder="e.g. UPI-TXN-98243">
+            </div>
+
+            <button type="submit" class="btn-3d btn-3d-primary" style="width: 100%; height: 50px; font-size: 1.05rem;">
+                <i class="fas fa-circle-check"></i> Authorize & Pay ₹{{ booking.total_amount }}
+            </button>
+        </form>
+
+        <p style="margin-top: 20px; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+            <i class="fas fa-info-circle"></i> Simulation Environment: No actual bank or credit card balance will be deducted.
+        </p>
+    </div>
+</div>
+
+<script>
+(function() {
+    var methods = document.querySelectorAll('input[name="method"]');
+    var cardFields = document.getElementById('card_fields');
+    var txnFields = document.getElementById('txn_fields');
+    methods.forEach(function(r) {
+        r.addEventListener('change', function() {
+            cardFields.style.display = (this.value === 'Card') ? 'flex' : 'none';
+            txnFields.style.display = (this.value === 'Online') ? 'flex' : 'none';
+        });
+    });
+})();
+</script>
+{% endblock %}

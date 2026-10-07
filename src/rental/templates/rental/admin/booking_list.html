@@ -1,0 +1,70 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}All Reservations - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Reservation Registry</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Complete ledger of customer vehicle bookings, contracts, and settlement status.</p>
+    </div>
+</div>
+
+<div class="table-3d-wrap tilt-card">
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Driver Information</th>
+                <th>Vehicle</th>
+                <th>Rental Interval</th>
+                <th>Total Fare</th>
+                <th>Payment Status</th>
+                <th>Contract & Cancellation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#VEL-{{ b.booking_id }}</td>
+                <td>
+                    <strong style="color: #ffffff;">{{ b.customer.name }}</strong>
+                    <div style="font-size: 0.82rem; color: var(--text-muted);">{{ b.customer.email }}</div>
+                </td>
+                <td>
+                    <strong style="color: #ffffff;">{{ b.car.brand }} {{ b.car.model }}</strong>
+                    <div style="font-size: 0.8rem; font-family: monospace; color: var(--text-muted);">{{ b.car.reg_no }}</div>
+                </td>
+                <td style="font-size: 0.88rem; color: var(--text-secondary);">
+                    {{ b.start_date }} &rarr; {{ b.end_date }}
+                </td>
+                <td style="font-weight: 700; color: #ffffff; font-size: 1.05rem;">₹{{ b.total_amount }}</td>
+                <td>
+                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+                        {% if b.payment_status == 'Paid' %}background: rgba(16, 185, 129, 0.2); color: #34d399;{% else %}background: rgba(245, 158, 11, 0.2); color: #fbbf24;{% endif %}">
+                        {{ b.payment_status }}
+                    </span>
+                </td>
+                <td>
+                    {% if b.is_cancelled %}
+                    <span style="color: #ef4444; font-size: 0.85rem; font-weight: 600;">
+                        <i class="fas fa-ban"></i> Cancelled (Refund: ₹{{ b.refund_amount|default:0 }})
+                    </span>
+                    {% else %}
+                    <span style="color: #34d399; font-size: 0.85rem;">
+                        <i class="fas fa-file-circle-check"></i> Active Contract
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    No reservation records currently logged.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

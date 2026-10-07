@@ -1,0 +1,126 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Driver Dossier: {{ customer.name }} - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Driver Profile Dossier</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Verified identity, license authentication, and trip history.</p>
+    </div>
+    <a href="{% url 'rental:admin_customer_list' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+        <i class="fas fa-arrow-left"></i> Back to Driver Database
+    </a>
+</div>
+
+<!-- Driver Card Details -->
+<div class="card-3d tilt-card" style="margin-bottom: 30px; padding: 28px; border-color: rgba(6, 182, 212, 0.3);">
+    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 20px;">
+        <div style="width: 64px; height: 64px; border-radius: 18px; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--accent-glow);">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div>
+            <h2 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 4px;">{{ customer.name }}</h2>
+            <span style="font-family: monospace; color: var(--text-muted);">MEMBER ID: #DRV-{{ customer.customer_id }}</span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Email Contact</div>
+            <div style="color: #ffffff; font-weight: 600; margin-top: 4px;">{{ customer.email }}</div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Phone Number</div>
+            <div style="color: #ffffff; font-weight: 600; margin-top: 4px; font-family: monospace;">{{ customer.phone_no }}</div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Driving License</div>
+            <div style="color: var(--accent-glow); font-weight: 700; margin-top: 4px; font-family: monospace;">{{ customer.license_no|default:"Verified" }}</div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Registered Address</div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">{{ customer.address|default:"Not specified" }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking History -->
+<div class="table-3d-wrap tilt-card" style="margin-bottom: 30px;">
+    <h3 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 16px;">
+        <i class="fas fa-calendar-check" style="color: var(--accent-glow);"></i> Driver Trip History
+    </h3>
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Booking Ref</th>
+                <th>Assigned Vehicle</th>
+                <th>Rental Dates</th>
+                <th>Total Fare</th>
+                <th>Settlement Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#VEL-{{ b.booking_id }}</td>
+                <td>{{ b.car.brand }} {{ b.car.model }} ({{ b.car.reg_no }})</td>
+                <td>{{ b.start_date }} to {{ b.end_date }}</td>
+                <td style="font-weight: 700; color: #ffffff;">₹{{ b.total_amount }}</td>
+                <td>
+                    <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+                        {% if b.payment_status == 'Paid' %}background: rgba(16, 185, 129, 0.2); color: #34d399;{% else %}background: rgba(245, 158, 11, 0.2); color: #fbbf24;{% endif %}">
+                        {{ b.payment_status }}
+                    </span>
+                    {% if b.is_cancelled %}<span style="color: #ef4444; font-size: 0.8rem; margin-left: 6px;">(Cancelled)</span>{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No trip history logged for this driver.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Payments -->
+<div class="table-3d-wrap tilt-card">
+    <h3 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 16px;">
+        <i class="fas fa-credit-card" style="color: var(--accent-glow);"></i> Payment Receipts
+    </h3>
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Payment Ref</th>
+                <th>Booking Ref</th>
+                <th>Amount Paid</th>
+                <th>Method</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#TXN-{{ p.payment_id }}</td>
+                <td style="font-family: monospace;">#VEL-{{ p.booking.booking_id }}</td>
+                <td style="font-weight: 700; color: #34d399;">₹{{ p.amount }}</td>
+                <td>{{ p.method }}</td>
+                <td>{{ p.payment_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No payment transactions on record.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

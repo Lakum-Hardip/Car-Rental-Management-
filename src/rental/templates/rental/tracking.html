@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Live Vehicle Telematics - Booking #{{ booking.booking_id }} | Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 70px;">
+    <!-- Telematics Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <div class="hero-badge" style="margin-bottom: 8px;">
+                <i class="fas fa-satellite-dish" style="color: #34d399;"></i> Telematics Active & Live
+            </div>
+            <h1 style="font-size: 2.2rem; color: #ffffff;">Real-Time GPS Tracking</h1>
+            <p style="color: var(--text-secondary); margin-top: 4px;">
+                Vehicle: <strong style="color: #ffffff;">{{ booking.car.brand }} {{ booking.car.model }}</strong> ({{ booking.car.reg_no }})
+            </p>
+        </div>
+        <a href="{% url 'rental:dashboard' %}" class="btn-3d btn-3d-glass btn-3d-sm">
+            <i class="fas fa-arrow-left"></i> Back to Bookings
+        </a>
+    </div>
+
+    <!-- 3D Telematics HUD Card -->
+    <div class="card-3d tilt-card" style="padding: 28px; border-color: rgba(6, 182, 212, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #34d399; box-shadow: 0 0 12px #34d399; animation: pulseGlow 2s infinite;"></div>
+                <span style="font-weight: 700; color: #ffffff; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Satellite Ping Status: Operational</span>
+            </div>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-family: monospace;">
+                LAT: {{ car.latitude|default:"23.022500" }} &bull; LNG: {{ car.longitude|default:"72.571400" }}
+            </span>
+        </div>
+
+        {% if google_maps_key %}
+            {% if car.latitude and car.longitude %}
+            <div id="map" style="height: 480px; border-radius: 18px; border: 1px solid var(--border-subtle); overflow: hidden; box-shadow: var(--glow-card);"></div>
+            <script>
+            function initMap() {
+                var lat = {{ car.latitude }};
+                var lng = {{ car.longitude }};
+                var center = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 15,
+                    center: center,
+                    styles: [
+                        { "elementType": "geometry", "stylers": [{"color": "#0f172a"}] },
+                        { "elementType": "labels.text.fill", "stylers": [{"color": "#38bdf8"}] },
+                        { "elementType": "labels.text.stroke", "stylers": [{"color": "#0284c7"}] },
+                        { "featureType": "road", "elementType": "geometry", "stylers": [{"color": "#1e293b"}] },
+                        { "featureType": "water", "elementType": "geometry", "stylers": [{"color": "#080b11"}] }
+                    ]
+                });
+                new google.maps.Marker({
+                    position: center,
+                    map: map,
+                    title: '{{ car.brand }} {{ car.model }}'
+                });
+            }
+            </script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap"></script>
+            {% else %}
+            <!-- Coordinate Fallback Display -->
+            <div style="height: 380px; border-radius: 18px; background: rgba(15, 23, 42, 0.7); border: 1px dashed var(--border-highlight); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+                <i class="fas fa-location-crosshairs" style="font-size: 3.5rem; color: var(--accent-glow); margin-bottom: 16px;"></i>
+                <h3 style="color: #ffffff; margin-bottom: 6px;">Coordinate Telemetry Standby</h3>
+                <p style="color: var(--text-secondary); max-width: 420px; font-size: 0.95rem;">
+                    Vehicle coordinate coordinates are being calibrated by dispatch. Pickup point is available at primary hub station.
+                </p>
+            </div>
+            {% endif %}
+        {% else %}
+        <!-- API Key Unset Simulator -->
+        <div style="height: 380px; border-radius: 18px; background: rgba(15, 23, 42, 0.7); border: 1px dashed var(--border-highlight); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+            <i class="fas fa-map-location-dot" style="font-size: 3.5rem; color: var(--accent-glow); margin-bottom: 16px;"></i>
+            <h3 style="color: #ffffff; margin-bottom: 6px;">Live Map Simulator Ready</h3>
+            <p style="color: var(--text-secondary); max-width: 440px; font-size: 0.95rem;">
+                GPS tracking hub registered for <strong>{{ car.brand }} {{ car.model }} ({{ car.reg_no }})</strong>. Real-time updates active.
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Quick Telematics Data Points -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px;">
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 16px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Vehicle Condition</span>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #34d399; margin-top: 4px;">
+                    <i class="fas fa-circle-check"></i> 100% Certified
+                </div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 16px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Speed Limit Governor</span>
+                <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-top: 4px;">
+                    Active (80 km/h)
+                </div>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 16px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Emergency Dispatch</span>
+                <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-glow); margin-top: 4px;">
+                    Online 24/7
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

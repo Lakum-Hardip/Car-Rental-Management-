@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Invoice Receipt #{{ booking.booking_id }} - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 680px; padding-top: 40px; padding-bottom: 70px;">
+    <div class="card-3d tilt-card" style="padding: 40px; border-color: rgba(16, 185, 129, 0.3);">
+        <!-- Top Status & Actions Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 24px; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 50px; height: 50px; border-radius: 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #34d399;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div>
+                    <h1 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 4px;">Booking Confirmed</h1>
+                    <span style="font-family: monospace; color: var(--text-muted);">INVOICE REF #VEL-{{ booking.booking_id }}</span>
+                </div>
+            </div>
+            <a href="{% url 'rental:receipt_pdf' booking.booking_id %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                <i class="fas fa-file-pdf" style="color: #ef4444;"></i> Download PDF
+            </a>
+        </div>
+
+        <!-- Breakdown Table in 3D Card -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">Customer Name</span>
+                    <strong style="color: #ffffff;">{{ customer.name }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">Email Address</span>
+                    <strong style="color: #ffffff;">{{ customer.email }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">Vehicle Model</span>
+                    <strong style="color: #ffffff;">{{ booking.car.brand }} {{ booking.car.model }} ({{ booking.car.reg_no }})</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">Rental Duration</span>
+                    <strong style="color: #ffffff;">{{ booking.start_date }} to {{ booking.end_date }}</strong>
+                </div>
+                {% if payment %}
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">Settlement Method</span>
+                    <span style="color: #34d399; font-weight: 600;"><i class="fas fa-check-double"></i> {{ payment.method }} &bull; {{ payment.payment_date }}</span>
+                </div>
+                {% endif %}
+                <div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 6px;">
+                    <span style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">Total Paid</span>
+                    <strong style="font-size: 1.8rem; color: var(--accent-glow); font-family: var(--font-heading);">₹{{ booking.total_amount }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 16px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; color: #34d399; display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+            <i class="fas fa-satellite-dish" style="font-size: 1.2rem;"></i>
+            <span style="font-size: 0.92rem;">Vehicle telematic link has been activated for this reservation period.</span>
+        </div>
+
+        <!-- Next Actions -->
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <a href="{% url 'rental:tracking' booking.booking_id %}" class="btn-3d btn-3d-primary" style="flex: 1;">
+                <i class="fas fa-location-dot"></i> Live GPS Vehicle Tracking
+            </a>
+            <a href="{% url 'rental:dashboard' %}" class="btn-3d btn-3d-glass" style="flex: 1;">
+                <i class="fas fa-gauge-high"></i> Driver Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

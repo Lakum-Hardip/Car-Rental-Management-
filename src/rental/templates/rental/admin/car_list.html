@@ -1,0 +1,79 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Fleet Inventory - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Fleet Inventory Matrix</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Manage vehicle operational status, daily pricing, and telematics.</p>
+    </div>
+    <a href="{% url 'rental:admin_car_add' %}" class="btn-3d btn-3d-primary btn-3d-sm">
+        <i class="fas fa-plus"></i> Add New Vehicle
+    </a>
+</div>
+
+<div class="table-3d-wrap tilt-card">
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Brand & Model</th>
+                <th>Registration</th>
+                <th>Type</th>
+                <th>Seats</th>
+                <th>Rate / Day</th>
+                <th>Operational Status</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for car in cars %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#{{ car.car_id }}</td>
+                <td>
+                    <strong style="color: #ffffff; font-size: 1rem;">{{ car.brand }} {{ car.model }}</strong>
+                </td>
+                <td style="font-family: monospace; color: var(--text-secondary);">{{ car.reg_no }}</td>
+                <td>
+                    <span style="background: rgba(255, 255, 255, 0.05); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color: var(--accent-glow);">
+                        {{ car.vehicle_type }}
+                    </span>
+                </td>
+                <td>{{ car.capacity }} Seats</td>
+                <td style="font-weight: 700; color: #ffffff;">₹{{ car.rent_per_day }}</td>
+                <td>
+                    <form method="post" action="{% url 'rental:admin_car_status' car.car_id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()" class="input-3d" style="padding: 6px 12px; font-size: 0.85rem; width: auto; border-radius: 8px;">
+                            <option value="Available" {% if car.status == 'Available' %}selected{% endif %}>🟢 Available</option>
+                            <option value="Booked" {% if car.status == 'Booked' %}selected{% endif %}>🔵 Booked</option>
+                            <option value="Maintenance" {% if car.status == 'Maintenance' %}selected{% endif %}>🟡 Maintenance</option>
+                        </select>
+                    </form>
+                </td>
+                <td style="text-align: right;">
+                    <div style="display: inline-flex; gap: 8px;">
+                        <a href="{% url 'rental:admin_car_edit' car.car_id %}" class="btn-3d btn-3d-glass btn-3d-sm">
+                            <i class="fas fa-pen-to-square"></i> Edit
+                        </a>
+                        <form method="post" action="{% url 'rental:admin_car_delete' car.car_id %}" style="display: inline;" onsubmit="return confirm('Delete this vehicle from inventory?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-3d btn-3d-danger btn-3d-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    No vehicles found in fleet database. <a href="{% url 'rental:admin_car_add' %}" style="color: var(--accent-glow);">Add first vehicle</a>.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

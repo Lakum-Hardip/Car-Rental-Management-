@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin Terminal Login - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 460px; padding-top: 50px; padding-bottom: 70px;">
+    <div class="card-3d tilt-card" style="padding: 38px; border-color: rgba(99, 102, 241, 0.4);">
+        <div style="text-align: center; margin-bottom: 28px;">
+            <div class="logo-icon-3d" style="width: 56px; height: 56px; font-size: 1.4rem; margin: 0 auto 16px; background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <h1 style="font-size: 1.9rem; color: #ffffff; margin-bottom: 6px;">Staff Terminal</h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Manager & Fleet Controller Portal</p>
+        </div>
+
+        <form method="post" action="{% url 'rental:admin_login' %}" id="adminLoginForm">
+            {% csrf_token %}
+            <div class="form-group-3d" style="margin-bottom: 18px;">
+                <label for="id_username"><i class="fas fa-user-shield" style="color: var(--accent-secondary);"></i> Staff Username</label>
+                <input type="text" name="username" id="id_username" class="input-3d" required minlength="2" maxlength="100" autocomplete="username" placeholder="admin">
+                {% if form.username.errors %}<p style="color: #ef4444; font-size: 0.85rem; margin-top: 4px;">{{ form.username.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-group-3d" style="margin-bottom: 18px;">
+                <label for="id_password"><i class="fas fa-lock" style="color: var(--accent-secondary);"></i> Security Key / Password</label>
+                <input type="password" name="password" id="id_password" class="input-3d" required autocomplete="current-password" placeholder="••••••••">
+                {% if form.password.errors %}<p style="color: #ef4444; font-size: 0.85rem; margin-top: 4px;">{{ form.password.errors.0 }}</p>{% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+                <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 10px; color: #f87171; font-size: 0.9rem; margin-bottom: 16px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+                <a href="{% url 'rental:admin_password_reset_request' %}" style="font-size: 0.85rem; color: #818cf8;">
+                    Forgot Access Key?
+                </a>
+            </div>
+
+            <button type="submit" class="btn-3d" style="width: 100%; height: 48px; font-size: 1rem; background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+                <i class="fas fa-fingerprint"></i> Authorize Staff Session
+            </button>
+        </form>
+
+        <div style="margin-top: 24px; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 20px; font-size: 0.9rem;">
+            <a href="{% url 'rental:login' %}" style="color: var(--text-secondary);">
+                <i class="fas fa-arrow-left"></i> Customer Sign-In Portal
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

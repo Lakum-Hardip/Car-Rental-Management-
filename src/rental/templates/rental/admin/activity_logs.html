@@ -1,0 +1,45 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Security Audit Logs - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">System Security & Activity Audit</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Cryptographically ordered chronological audit trail of all staff and system modifications.</p>
+    </div>
+</div>
+
+<div class="table-3d-wrap tilt-card">
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Staff Account</th>
+                <th>Action Taken</th>
+                <th>Entity Affected</th>
+                <th>Audit Details</th>
+                <th>Network IP</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td style="font-size: 0.85rem; color: var(--text-muted); font-family: monospace;">{{ log.created_at|date:"M d, Y H:i:s" }}</td>
+                <td><strong style="color: #ffffff;"><i class="fas fa-user-shield" style="color: var(--accent-glow); margin-right: 6px;"></i>{{ log.admin.username|default:"System" }}</strong></td>
+                <td style="color: var(--accent-glow); font-weight: 600;">{{ log.action }}</td>
+                <td><span style="background: rgba(255, 255, 255, 0.05); padding: 3px 8px; border-radius: 6px; font-size: 0.8rem;">{{ log.model_name|default:"-" }}</span></td>
+                <td style="color: var(--text-secondary); font-size: 0.9rem;">{{ log.details|truncatewords:15 }}</td>
+                <td style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted);">{{ log.ip_address|default:"127.0.0.1" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No audit records logged yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

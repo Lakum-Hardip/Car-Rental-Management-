@@ -1,0 +1,107 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Fleet Analytics & Reports - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Analytics & Revenue Reports</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Periodic financial intelligence and fleet utilization metrics.</p>
+    </div>
+    
+    <!-- Timeframe Filters -->
+    <div style="display: flex; gap: 8px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-subtle); padding: 4px; border-radius: 14px;">
+        <a href="?period=day" class="btn-3d {% if period == 'day' %}btn-3d-primary{% else %}btn-3d-glass{% endif %} btn-3d-sm">Daily</a>
+        <a href="?period=week" class="btn-3d {% if period == 'week' %}btn-3d-primary{% else %}btn-3d-glass{% endif %} btn-3d-sm">Weekly</a>
+        <a href="?period=month" class="btn-3d {% if period == 'month' %}btn-3d-primary{% else %}btn-3d-glass{% endif %} btn-3d-sm">Monthly</a>
+        <a href="?period=year" class="btn-3d {% if period == 'year' %}btn-3d-primary{% else %}btn-3d-glass{% endif %} btn-3d-sm">Yearly</a>
+    </div>
+</div>
+
+<!-- Revenue & Booking Aggregate Card -->
+<div class="stat-grid-3d" style="margin-bottom: 28px;">
+    <div class="stat-card-3d tilt-card">
+        <h3>Cumulative Period Bookings</h3>
+        <div class="stat-val text-gradient-cyan">{{ total_bookings }}</div>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">In selected interval</span>
+    </div>
+
+    <div class="stat-card-3d tilt-card">
+        <h3>Cumulative Period Revenue</h3>
+        <div class="stat-val text-gradient">₹{{ total_revenue }}</div>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">In selected interval</span>
+    </div>
+</div>
+
+<!-- Interval Table -->
+<div class="table-3d-wrap tilt-card" style="margin-bottom: 36px;">
+    <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 16px;">
+        <i class="fas fa-calendar-days" style="color: var(--accent-glow);"></i> Interval Revenue Breakdown
+    </h2>
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Timeline Period</th>
+                <th>Reservations Logged</th>
+                <th>Revenue Realized</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in summary_rows %}
+            <tr>
+                <td style="font-weight: 600; color: #ffffff;">{{ d.label }}</td>
+                <td>{{ d.bookings }} Trips</td>
+                <td style="font-weight: 700; color: #34d399;">₹{{ d.revenue }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No report records for the chosen interval.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Vehicle Utilization Frequency -->
+<div class="table-3d-wrap tilt-card">
+    <h2 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 16px;">
+        <i class="fas fa-chart-pie" style="color: var(--accent-glow);"></i> Fleet Utilization & Demand Frequency
+    </h2>
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Vehicle Model</th>
+                <th>Registration</th>
+                <th>Powertrain</th>
+                <th>Status</th>
+                <th>Total Completed Bookings</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for car in vehicle_usage %}
+            <tr>
+                <td><strong style="color: #ffffff;">{{ car.brand }} {{ car.model }}</strong></td>
+                <td style="font-family: monospace; color: var(--text-muted);">{{ car.reg_no }}</td>
+                <td>{{ car.vehicle_type }}</td>
+                <td>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: {% if car.status == 'Available' %}#34d399{% elif car.status == 'Booked' %}#38bdf8{% else %}#fbbf24{% endif %};">
+                        {{ car.status }}
+                    </span>
+                </td>
+                <td>
+                    <strong style="color: var(--accent-glow); font-size: 1.05rem;">{{ car.booking_count }}</strong> bookings
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No fleet vehicles recorded.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

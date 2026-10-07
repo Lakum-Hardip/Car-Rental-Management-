@@ -1,0 +1,49 @@
+{% extends 'rental/admin/base_admin.html' %}
+{% load static %}
+{% block title %}Payment Ledger - Velocity 3D{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1 style="font-size: 2.2rem; color: #ffffff;">Financial Transactions & Ledger</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Verified payment transactions processed through all digital payment instruments.</p>
+    </div>
+</div>
+
+<div class="table-3d-wrap tilt-card">
+    <table class="table-3d">
+        <thead>
+            <tr>
+                <th>Payment ID</th>
+                <th>Booking Ref</th>
+                <th>Payer Name</th>
+                <th>Settled Amount</th>
+                <th>Payment Channel</th>
+                <th>Execution Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td style="font-family: monospace; color: var(--accent-glow);">#TXN-{{ p.payment_id }}</td>
+                <td style="font-family: monospace;">#VEL-{{ p.booking.booking_id }}</td>
+                <td><strong style="color: #ffffff;">{{ p.booking.customer.name }}</strong></td>
+                <td style="font-weight: 700; color: #34d399; font-size: 1.05rem;">₹{{ p.amount }}</td>
+                <td>
+                    <span style="background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 8px; font-size: 0.82rem; color: #ffffff;">
+                        <i class="fas {% if p.method == 'Card' %}fa-credit-card{% elif p.method == 'Online' %}fa-qrcode{% else %}fa-money-bill{% endif %}"></i> {{ p.method }}
+                    </span>
+                </td>
+                <td style="color: var(--text-secondary);">{{ p.payment_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No payment records logged in ledger yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
