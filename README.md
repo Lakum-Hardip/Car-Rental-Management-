@@ -51,11 +51,33 @@ A **complete, production-ready** web-based Car Rental Management System built wi
 
 | Layer    | Technology        |
 |----------|-------------------|
-| Frontend | HTML5, CSS3, Vanilla JavaScript |
-| Backend  | Python 3, Django 4.x |
-| Database | MySQL 8.x (utf8mb4) |
-| Maps     | Google Maps JavaScript API |
-| PDF      | ReportLab |
+| Frontend | **React.js 19 + Tailwind CSS + Three.js 3D Engine + Vite** |
+| Backend  | Python 3, Django 4.x (REST API + ORM) |
+| Database | SQLite3 / MySQL 8.x |
+| Maps / GPS| Real-time GPS Telematics HUD |
+| 3D Engine| Three.js WebGL Hologram & Gyroscope 3D Cards |
+
+## How to Run the Application
+
+### 1. Start Python Backend (Django)
+```powershell
+# In project root:
+.\.venv\Scripts\activate
+python manage.py runserver
+```
+Backend API will be accessible at `http://127.0.0.1:8000/`.
+
+### 2. Start React.js + Tailwind CSS Frontend
+```powershell
+# In another terminal, navigate to frontend:
+cd frontend
+npm run dev
+```
+Open your browser at `http://localhost:5173/`.
+
+### Demo Credentials:
+- **Admin Dashboard**: `http://localhost:5173/admin/login` (Username: `admin` | Password: `admin123`)
+- **Customer Portal**: `http://localhost:5173/login` (Email: `lakumhardip11@gmail.com` | Password: `Hardip@123` or create a new account)
 
 ## Project Structure
 
